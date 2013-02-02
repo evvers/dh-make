@@ -1,0 +1,5 @@
+#!/usr/bin/make -f
+#
+# Makefile for dh-make package
+%:
+	dh $@
