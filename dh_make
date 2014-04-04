@@ -33,7 +33,6 @@ our $version="";
 our $fullname = "";
 our $package_class="";
 our $CHANGELOG="";
-our $PRESERVE="";
 our $forced_package_name="";
 our $assume_yes = 0;
 our @filenames;
@@ -57,7 +56,6 @@ sub process_file(@)
 		$line =~ s/#SHORTDATE#/$main::shortdate/g;
 		$line =~ s/#YEAR#/$main::year/g;
 		$line =~ s/#CHANGELOGS#/$main::CHANGELOG/g;
-		$line =~ s/#PRESERVE#/ $main::PRESERVE/g;
 		$line =~ s/#CONFIG_STATUS#/$main::CONFIG_STATUS/g;
 		$line =~ s/#CONFIGURE#/$main::CONFIGURE/g;
 		$line =~ s/#CONFIGURE_STAMP#/$main::CONFIGURE_STAMP/g;
@@ -397,15 +395,6 @@ if ($main::license eq '')
 }
 
 print_confirmation;
-
-# Are there any .orig files in the upstream sources
-my @ORIG= split /[ \n]/, qx(find . -name '\*.orig');
-
-my $orig;
-foreach $orig (@ORIG)
-{
-	$PRESERVE="$PRESERVE --exclude $orig";
-}
 
 our ($CONFIG_STATUS, $CONFIGURE_STAMP, $PHONY_CONFIGURE, $CONFIGURE, $DPKG_ARCH, $INSTALL, $CLEAN, $MAKE, $CDBS_CLASS );
 our $BUILD_DEPS = 'debhelper (>= 8.0.0)';
