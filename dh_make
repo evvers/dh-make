@@ -22,8 +22,6 @@ my %PACKAGE_CLASSES = (
 	'd' => 'daemon-mode config',
 	'c' => 'cron-mode config',
 );
-my %RULES_FORMATS = ('dh7' => 'Debhelper v7+', 'old' => 'old debhelper',
-	'c' => 'cdbs');
 
 our $DASHLINE="";
 
@@ -33,7 +31,6 @@ our $package_name="";
 our $cap_package_name="";
 our $version="";
 our $fullname = "";
-our $rules_format = "dh7";
 our $source_file="";
 our $create_orig_tar = 0;
 our $package_class="";
@@ -152,8 +149,6 @@ sub show_help
   -t, --templates <dir>     apply customizing templates in <dir>
   -d  --defaultless         skip the default debian and package class templates
   -p, --packagename <name>  force package name to be <name>
-  -r, --rulesformat <fmt>   Set the format of debian/rules file
-                            (old|dh7|cdbs)
   -y, --yes					Automatic yes to prompts and run non-interactively
   -h, --help                display this help screen and exit
   -v, --version             show the version and exit
@@ -183,7 +178,6 @@ sub parse_args
 			'kpatch' => \$kpatch,
 			'with-emacs' => \$main::with_emacs,
 			'addmissing|a' => \$main::add_missing,
-			'rulesformat|r=s' => \$main::rules_format,
 			'templates|t=s' => \$main::custom,
 			'packagename|p=s' => \$main::forced_package_name,
 			'yes|y' => \$main::assume_yes
@@ -242,19 +236,6 @@ sub parse_args
 	# Change the non-versioned into the latest version
 	$main::license = "gpl3" if ($main::license eq "gpl");
 	$main::license = "lgpl3" if ($main::license eq "lgpl");
-
-	# Verifuly ruletype
-	$main::rules_format = lc $main::rules_format;
-	if ($main::rules_format eq "")
-	{
-		$main::rules_format = "dh7";
-	} else {
-		if ($main::rules_format !~ /^(dh7|old|cdbs)$/)
-		{
-			print "Rules Format \"$main::rules_format\" is not dh7, old or cdbs.\n";
-			exit;
-		}
-	}
 }
 
 sub get_logname
@@ -513,9 +494,6 @@ foreach $orig (@ORIG)
 our ($CONFIG_STATUS, $CONFIGURE_STAMP, $PHONY_CONFIGURE, $CONFIGURE, $DPKG_ARCH, $INSTALL, $CLEAN, $MAKE, $CDBS_CLASS );
 our $BUILD_DEPS = 'debhelper (>= 8.0.0)';
 our $DH7_ADDON = '';
-if ($rules_format eq "cdbs") {
-	$BUILD_DEPS = 'cdbs, '.$BUILD_DEPS;
-}
 
 our ($PATCH_CLASS,$PATCH_STAMP,$PATCH_CLEAN);
 
@@ -677,13 +655,6 @@ if ( $package_class eq 'k')
 @filenames = split / |\n/, qx{(cd $DHLIB/debian$package_class && ls)};
 foreach $filename (@filenames)
 {
-	if ( $filename=~/^rules/ )
-	{
-		if ( $filename ne "rules.$rules_format")
-		{
-			next;
-		}
-	}
 	process_file("$DHLIB/debian$package_class/$filename", $filename);
 }
 
@@ -710,18 +681,6 @@ if ( $custom ne "" )
 	} else {
 		print "Unable to find the customization directory, $custom\n";
 	}
-}
-
-if ( -f "rules")
-{
-	print "File rules already exists, skipping.\n";
-} else {
-	if ( ! -f "rules.$rules_format")
-	{
-		print "Cannot find rules file for rules format \"$rules_format\".\n";
-		exit;
-	}
-	system('mv', "rules.$rules_format", "rules");
 }
 
 # kernel-patch kpatch file name
