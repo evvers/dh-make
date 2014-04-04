@@ -422,106 +422,23 @@ our $DH7_ADDON = '';
 our ($PATCH_CLASS,$PATCH_STAMP,$PATCH_CLEAN);
 
 # Setup debian/rules
-if (-x "./configure" )
-{
-	$CDBS_CLASS="include /usr/share/cdbs/1/class/autotools.mk";
-	$CONFIG_STATUS="config.status";
-	$CONFIGURE_STAMP='';
-	$PHONY_CONFIGURE='';
-	$CONFIGURE="config.status: configure\n".
+$CDBS_CLASS="include /usr/share/cdbs/1/class/makefile.mk";
+$CONFIGURE_STAMP='configure-stamp';
+$CONFIG_STATUS='';
+$CONFIGURE="configure: configure-stamp\n".
+			 "configure-stamp:\n". 
 		 "\tdh_testdir\n".
-		 "\t# Add here commands to configure the package.\n".
-		 "ifneq \"\$(wildcard /usr/share/misc/config.sub)\" \"\"\n".
-		 "\tcp -f /usr/share/misc/config.sub config.sub\n".
-		 "endif\n".
-		 "ifneq \"\$(wildcard /usr/share/misc/config.guess)\" \"\"\n".
-		 "\tcp -f /usr/share/misc/config.guess config.guess\n".
-		 "endif\n".
-		 "\t".'./configure $(CROSS) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs"'."\n";
-	$DPKG_ARCH="# These are used for cross-compiling and for saving the configure script\n".
-			 "# from having to guess our platform (since we know it already)\n".
-			 'DEB_HOST_GNU_TYPE	?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)'."\n".
-			 'DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)'."\n".
-			 'ifneq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))'."\n".
-			 'CROSS= --build $(DEB_BUILD_GNU_TYPE) --host $(DEB_HOST_GNU_TYPE)'."\n".
-			 'else'."\n".
-			 'CROSS= --build $(DEB_BUILD_GNU_TYPE)'."\n".
-			 'endif'."\n";
-
-	$MAKE="\$(MAKE)";
-	# If it is automaked, use DESTDIR insteadof prefix
-	if ( -f 'Makefile.am' )
-	{
-		# If it is a library then install into tmp
-	 	if ( $package_class eq "l")
-	   	{
-			$INSTALL="\$(MAKE) DESTDIR=\$(CURDIR)/debian/tmp install";
-	 	} else {
-			$INSTALL="\$(MAKE) DESTDIR=\$(CURDIR)/debian/$package_name install";
-	 	}
-	} else {
-		if ( $package_class eq "l")
-		{
-			$INSTALL="\$(MAKE) prefix=\$(CURDIR)/debian/tmp/usr install";
-	 	} else {
-			$INSTALL="\$(MAKE) prefix=\$(CURDIR)/debian/$package_name/usr install";
-	 	}
-	}
-	$CLEAN="[ ! -f Makefile ] || \$(MAKE) distclean\n".
-			"\trm -f config.sub config.guess";
-	$BUILD_DEPS .= ', autotools-dev';
-	$DH7_ADDON .= ' --with autotools-dev';
-} elsif (-f 'CMakeLists.txt') {
-	$CDBS_CLASS="include /usr/share/cdbs/1/class/cmake.mk";
-	$CONFIG_STATUS="builddir/Makefile";
-	$CONFIGURE_STAMP='';
-	$PHONY_CONFIGURE='';
-	$CONFIGURE="builddir/Makefile:\n".
-				 "\tdh_testdir\n".
-			 "\t# Add here commands to configure the package.\n".
-			 "\t".'mkdir -p builddir'."\n".
-			 "\t".'cd builddir && cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_C_FLAGS="$(CFLAGS)" -DCMAKE_LD_FLAGS="-Wl,-z,defs" -DCMAKE_CXX_FLAGS="$(CXXFLAGS)" -DCMAKE_SKIP_RPATH=ON -DCMAKE_VERBOSE_MAKEFILE=ON'."\n";
-	$MAKE="\$(MAKE) -C builddir";
-	# If it is a library then install into tmp
-	if ( $package_class eq "l")
-	{
-		$INSTALL="\$(MAKE) -C builddir DESTDIR=\$(CURDIR)/debian/tmp install";
-	} else {
-		$INSTALL="\$(MAKE) -C builddir DESTDIR=\$(CURDIR)/debian/$package_name install";
-	}
-	$CLEAN="rm -rf builddir\n";
-	$BUILD_DEPS .= ', cmake';
-
+		 "\t# Add here commands to configure the package.\n\n".
+		 "\ttouch configure-stamp\n";
+$PHONY_CONFIGURE='configure';
+$MAKE="\$(MAKE)";
+$DPKG_ARCH='';
+if ($package_class eq "l") {
+ $INSTALL="\$(MAKE) DESTDIR=\$(CURDIR)/debian/tmp install";
 } else {
-	if (! -f 'Makefile' && ! -f 'makefile' && ! -f 'GNUmakefile')
-	{
-	 print "Currently there is no top level Makefile. This may require additional tuning.\n";
-	}
-	$CDBS_CLASS="include /usr/share/cdbs/1/class/makefile.mk";
-	$CONFIGURE_STAMP='configure-stamp';
-	$CONFIG_STATUS='';
-	$CONFIGURE="configure: configure-stamp\n".
-				 "configure-stamp:\n". 
-			 "\tdh_testdir\n".
-			 "\t# Add here commands to configure the package.\n\n".
-			 "\ttouch configure-stamp\n";
-	$PHONY_CONFIGURE='configure';
-	$MAKE="\$(MAKE)";
-	$DPKG_ARCH='';
-	if ($package_class eq "l") {
-	 $INSTALL="\$(MAKE) DESTDIR=\$(CURDIR)/debian/tmp install";
-	} else {
-	 $INSTALL="\$(MAKE) DESTDIR=\$(CURDIR)/debian/$package_name install";
-	}
-	$CLEAN='$(MAKE) clean';
+ $INSTALL="\$(MAKE) DESTDIR=\$(CURDIR)/debian/$package_name install";
 }
-if ($package_class eq "k") {
-	$BUILD_DEPS .= ', bzip2';
-}
-
-if ($package_class eq "n") {
-	$BUILD_DEPS .= ', dh-kpatches';
-}
+$CLEAN='$(MAKE) clean';
 
 # Customize files
 if ( ! -d 'debian')
@@ -561,11 +478,6 @@ if ($license eq '')
 		die "Unable to find copyright template file $DHLIB/licenses/$license";
 	}
 }
-# Remove the  README if a kernel package, we use the specific one
-if ( $package_class eq 'k')
-{
-	unlink('README.Debian');
-}
 
 # Special Files
 @filenames = split / |\n/, qx{(cd $DHLIB/debian$package_class && ls)};
@@ -573,24 +485,6 @@ foreach $filename (@filenames)
 {
 	process_file("$DHLIB/debian$package_class/$filename", $filename);
 }
-
-# Custom template
-if ( $custom ne "" )
-{
-	if ( -d $custom )
-	{
-		@filenames = split /[\n]/, qx{(cd $custom && ls)};
-		foreach $filename (@filenames)
-		{
-			process_file("$custom/$filename", $filename);
-	 	}
-	} else {
-		print "Unable to find the customization directory, $custom\n";
-	}
-}
-
-# kernel-patch kpatch file name
-rename "kpatches", "$package_name.kpatches" if $package_class eq "n";
 
 @filenames = split / |\n/, qx(ls package* 2>/dev/null);
 if ($#filenames != -1)
