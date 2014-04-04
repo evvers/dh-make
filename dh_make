@@ -23,8 +23,6 @@ my %PACKAGE_CLASSES = (
 	'c' => 'cron-mode config',
 );
 
-our $DASHLINE="";
-
 our $license="";
 our $username="";
 our $package_name="";
@@ -51,22 +49,8 @@ sub process_file(@)
 		$line =~ s/#EMAIL#/$main::email/g;
 		$line =~ s/#DATE#/$main::date/g;
 		$line =~ s/#YEAR#/$main::year/g;
-		$line =~ s/#CHANGELOGS#/$main::CHANGELOG/g;
-		$line =~ s/#CONFIG_STATUS#/$main::CONFIG_STATUS/g;
-		$line =~ s/#CONFIGURE#/$main::CONFIGURE/g;
-		$line =~ s/#CONFIGURE_STAMP#/$main::CONFIGURE_STAMP/g;
-		$line =~ s/#DPKG_ARCH#/$main::DPKG_ARCH/g;
-		$line =~ s/#INSTALL#/$main::INSTALL/g;
-		$line =~ s/#MAKE#/$main::MAKE/g;
-		$line =~ s/#CLEAN#/$main::CLEAN/g;
 		$line =~ s/#USERNAME#/$main::username/g;
 		$line =~ s/#POLICY#/$main::POLICY_VERSION/g;
-		$line =~ s/#DASHLINE#/$main::DASHLINE/g;
-		$line =~ s/#PHONY_CONFIGURE#/$main::PHONY_CONFIGURE/g;
-		$line =~ s/#CDBS_CLASS#/$main::CDBS_CLASS/g;
-		$line =~ s/#PATCH_CLASS#/$main::PATCH_CLASS/g;
-		$line =~ s/#PATCH_CLEAN#/$main::PATCH_CLEAN/g;
-		$line =~ s/#PATCH_STAMP#/$main::PATCH_STAMP/g;
 		$line =~ s/#BUILD_DEPS#/$main::BUILD_DEPS/g;
 		$line =~ s/#DH7_ADDON#/$main::DH7_ADDON/g;
 		print OUT $line;
@@ -365,12 +349,6 @@ chomp $year;
 parse_args();
 get_package();
 
-# Generate a line of dashes, which is as long as '#PACKAGE# for Debian'.
-for (my $i=0; $i<length("$main::package_name for Debian"); $i++)
-{
-	$DASHLINE = $DASHLINE . '-';
-}
-
 while ($package_class eq "")
 {
 	print "\nType of package: daemon-config, cron-config?\n [d/c] ";
@@ -389,30 +367,10 @@ if ($main::license eq '')
 
 print_confirmation;
 
-our ($CONFIG_STATUS, $CONFIGURE_STAMP, $PHONY_CONFIGURE, $CONFIGURE, $DPKG_ARCH, $INSTALL, $CLEAN, $MAKE, $CDBS_CLASS );
 our $BUILD_DEPS = 'debhelper (>= 8.0.0)';
 our $DH7_ADDON = '';
 
-our ($PATCH_CLASS,$PATCH_STAMP,$PATCH_CLEAN);
-
 # Setup debian/rules
-$CDBS_CLASS="include /usr/share/cdbs/1/class/makefile.mk";
-$CONFIGURE_STAMP='configure-stamp';
-$CONFIG_STATUS='';
-$CONFIGURE="configure: configure-stamp\n".
-			 "configure-stamp:\n". 
-		 "\tdh_testdir\n".
-		 "\t# Add here commands to configure the package.\n\n".
-		 "\ttouch configure-stamp\n";
-$PHONY_CONFIGURE='configure';
-$MAKE="\$(MAKE)";
-$DPKG_ARCH='';
-if ($package_class eq "l") {
- $INSTALL="\$(MAKE) DESTDIR=\$(CURDIR)/debian/tmp install";
-} else {
- $INSTALL="\$(MAKE) DESTDIR=\$(CURDIR)/debian/$package_name install";
-}
-$CLEAN='$(MAKE) clean';
 
 # Customize files
 if ( ! -d 'debian')
