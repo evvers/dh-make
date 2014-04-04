@@ -43,7 +43,6 @@ our @filenames;
 our $filename;
 our $SOURCE_EXTRADOCS="";
 our ($email, $date);
-our $with_emacs = 0;
 
 sub process_file(@)
 {
@@ -416,12 +415,6 @@ my @changelogs= split / |\n/, qx(ls *[cC][hH][aA][nN][gG][eE][lL][oO][gG]* [cC][
 $CHANGELOG = $changelogs[0] if ($#changelogs != -1);
 shift @changelogs;
 @DOCS = (@DOCS,@changelogs);
-# check whether emacs files exist or not
-our @EMACS= split / |\n/, qx(find . -regex '.*\\.el');
-if (! @EMACS eq '')
-{
-	$with_emacs = 1;
-}
 # Are there any .orig files in the upstream sources
 my @ORIG= split /[ \n]/, qx(find . -name '\*.orig');
 
@@ -588,16 +581,6 @@ if ( $package_class eq 'k')
 foreach $filename (@filenames)
 {
 	process_file("$DHLIB/debian$package_class/$filename", $filename);
-}
-
-# emacs files
-if ($with_emacs) 
-{
-	@filenames= split / |\n/, qx{(cd $DHLIB/emacs && ls)};
-	foreach $filename (@filenames)
-	{
-		process_file("$DHLIB/emacs/$filename", $filename);
-	}
 }
 
 # Custom template
