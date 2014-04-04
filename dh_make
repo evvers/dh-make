@@ -681,19 +681,7 @@ if ($#filenames != -1)
 }
 chmod 0755, 'rules';
 
-if ($CONFIG_STATUS ne "")
-{
-	print "Done. Please edit the files in the debian/ subdirectory now. $package_name\n";
-	print "uses a configure script, so you probably don't have to edit the Makefiles.\n";
-} else {
-	print "Done. Please edit the files in the debian/ subdirectory now. You should also\n";
-	print "check that the $package_name Makefiles install into \$DESTDIR and not in / .\n";
-}
-if ($package_class eq 'l')
-{
-	print "Make sure you change the package name from $package_name"."BROKEN to something\n".
-		  "else, such as $package_name"."1 in the debian/control file.\n";
-}
+print "Done. Please edit the files in the debian/ subdirectory now.\n";
 
 
 exit 0;
