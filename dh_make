@@ -35,7 +35,6 @@ our $version="";
 our $fullname = "";
 our $rules_format = "dh7";
 our $source_file="";
-our $debian_native = 1;
 our $create_orig_tar = 0;
 our $package_class="";
 our $CHANGELOG="";
@@ -141,7 +140,6 @@ sub show_help
                              lgpl3|mit)
   -C, --packageclass <cls>  set package class (s|i|k||l||m||n)
   -e, --email <address>     use <address> as the maintainer e-mail address
-  -n, --native              the program is Debian native, don\'t generate .orig
   -f, --file <file>         specify file to use as the original source archive
       --createorig          create orig.tar.xz file
   -s, --single              set package class to single
@@ -765,15 +763,6 @@ if ( -f "info" )
 			print INFOFILE "$info\n";
 	 	}
 	 	close (INFOFILE);
-	}
-}
-
-if ( ! $no_defaults )
-{
-	@filenames = split / |\n/, qx{(cd $DHLIB/native && ls)};
-	foreach $filename (@filenames)
-	{
-		process_file("$DHLIB/native/$filename", $filename);
 	}
 }
 
