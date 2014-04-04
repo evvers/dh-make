@@ -28,11 +28,9 @@ our $DASHLINE="";
 our $license="";
 our $username="";
 our $package_name="";
-our $cap_package_name="";
 our $version="";
 our $fullname = "";
 our $package_class="";
-our $CHANGELOG="";
 our $forced_package_name="";
 our $assume_yes = 0;
 our @filenames;
@@ -49,7 +47,6 @@ sub process_file(@)
 	while (defined($line = <IN>))
 	{
 		$line =~ s/#PACKAGE#/$main::package_name/g;
-		$line =~ s/#UCPACKAGE#/$main::uc_package_name/g;
 		$line =~ s/#VERSION#/$main::version/g;
 		$line =~ s/#EMAIL#/$main::email/g;
 		$line =~ s/#DATE#/$main::date/g;
@@ -274,7 +271,6 @@ sub get_package
 		} else {
 			$main::package_name = $1;
 		}
-		$main::uc_package_name = uc $main::package_name;
 		if ($forced_package_version)
 	   	{
 			$main::fullname = $1 . "-"  . $forced_package_version;
