@@ -43,7 +43,6 @@ our $PRESERVE="";
 our $add_missing = 0;
 our $custom = "";
 our $no_defaults = 0;
-our $overlay = "";
 our $forced_package_name="";
 our $assume_yes = 0;
 our @filenames;
@@ -59,13 +58,10 @@ sub process_file(@)
 	my $line;
 	$outfile2 =~ s/\.ex$//;
 
-	if ( $main::overlay eq "" )
+	if ( $main::add_missing && ( -f $outfile  ||  -f $outfile2 ))
 	{
-		if ( $main::add_missing && ( -f $outfile  ||  -f $outfile2 ))
-		{
-			print "File $outfile exists, skipping.\n";
-			return;
-		}
+		print "File $outfile exists, skipping.\n";
+		return;
 	}
 
 	open IN, "<$infile" or die "Unable to open template file $infile for reading: $! \n";
@@ -110,13 +106,10 @@ sub output_source_format
 {
 	my $outfile = "source/format";
 
-	if ( $main::overlay eq "" )
+	if ( $main::add_missing && -f $outfile)
 	{
-		if ( $main::add_missing && -f $outfile)
-		{
-			print "File $outfile exists, skipping.\n";
-			return;
-		}
+		print "File $outfile exists, skipping.\n";
+		return;
 	}
 
 	if ( ! -d 'source' )
@@ -166,7 +159,6 @@ sub show_help
   -a, --addmissing          reprocess package and add missing files
   -t, --templates <dir>     apply customizing templates in <dir>
   -d  --defaultless         skip the default debian and package class templates
-  -o, --overlay <dir>       reprocess package using template in <dir>
   -p, --packagename <name>  force package name to be <name>
   -r, --rulesformat <fmt>   Set the format of debian/rules file
                             (old|dh7|cdbs)
@@ -203,7 +195,6 @@ sub parse_args
 			'rulesformat|r=s' => \$main::rules_format,
 			'templates|t=s' => \$main::custom,
 			'defaultless|d' => \$main::no_defaults,
-			'overlay|o=s' => \$main::overlay,
 			'packagename|p=s' => \$main::forced_package_name,
 			'yes|y' => \$main::assume_yes
 		) == 0)
@@ -460,7 +451,6 @@ sub print_confirmation
 		die "Unknown type of config\n";
 	}
 	print "\nCustom template : $custom" if ( $custom ne "" );
-	print " (overlay)" if ( $overlay ne "" );
 	print "\nDefault debian and package class templates will not be applied." if ( $no_defaults );
 	if ($assume_yes == 0 )
 	{
@@ -693,7 +683,7 @@ if ( $add_missing )
 {
 	if ( ! -d 'debian' )
 	{
-		die "--addmissing  or --overlay flag used but cannot find debian subdirectory\n";
+		die "--addmissing flag used but cannot find debian subdirectory\n";
 	}
 } else {
 	if ( ! -d 'debian')
