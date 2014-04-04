@@ -18,9 +18,10 @@ $Getopt::Long::autoabbrev = 0;
 our $DHLIB="/usr/share/debhelper/dh_make";
 our $POLICY_VERSION="3.9.4";
 our $DH_MAKE_VERSION="0.62";
-my %PACKAGE_CLASSES = ( 's' => 'Single', 'l' => 'Library',
-   	'm' => 'Multi-Binary', 'k' => 'Kernel Module',
-   	'n' => 'Kernel Patch', 'i' => 'Independent' );
+my %PACKAGE_CLASSES = (
+	'd' => 'daemon-mode config',
+	'c' => 'cron-mode config',
+);
 my %RULES_FORMATS = ('dh7' => 'Debhelper v7+', 'old' => 'old debhelper',
 	'c' => 'cdbs');
 
@@ -456,7 +457,7 @@ sub print_confirmation
 	{
 		print $PACKAGE_CLASSES{$package_class};
 	} else {
-		print 'unknown';
+		die "Unknown type of config\n";
 	}
 	print "\nCustom template : $custom" if ( $custom ne "" );
 	print " (overlay)" if ( $overlay ne "" );
