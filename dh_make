@@ -500,17 +500,13 @@ if ( ! $no_defaults )
 {
 	while ($package_class eq "")
 	{
-		print "\nType of package: single binary, indep binary, multiple binary, library, kernel module, kernel patch?\n [s/i/m/l/k/n] ";
+		print "\nType of package: daemon-config, cron-config?\n [d/c] ";
 	 	my $type = <STDIN>;
 	 	chomp($type);
 	 	print "\n";
 	 	$type = lc($type);
-	 	$main::package_class = 's' if $type eq 's';
-	 	$main::package_class = 'i' if $type eq 'i';
-	 	$main::package_class = 'm' if $type eq 'm';
-	 	$main::package_class = 'l' if $type eq 'l';
-	 	$main::package_class = 'k' if $type eq 'k';
-	 	$main::package_class = 'n' if $type eq 'n';
+	 	$main::package_class = 'd' if $type eq 'd';
+	 	$main::package_class = 'c' if $type eq 'c';
 	}
 }
 
