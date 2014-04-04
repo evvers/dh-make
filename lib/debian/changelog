@@ -1,5 +1,5 @@
-#PACKAGE# (#VERSION#-1) unstable; urgency=low
+#PACKAGE# (#VERSION#) unstable; urgency=low
 
-  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+  * Initial Release.
 
  -- #USERNAME# <#EMAIL#>  #DATE#

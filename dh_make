@@ -15,7 +15,7 @@ Getopt::Long::Configure ("no_ignore_case");
 $Getopt::Long::autoabbrev = 0;
 
 # Some important parameters
-our $DHLIB="/usr/share/debhelper/dh_make";
+our $DHLIB="/home/evvers/packages/dh-make/lib";
 our $POLICY_VERSION="3.9.4";
 our $DH_MAKE_VERSION="0.62";
 my %PACKAGE_CLASSES = (
