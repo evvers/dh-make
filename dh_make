@@ -406,13 +406,6 @@ if ($main::license eq '')
 
 print_confirmation;
 
-# Figure out where documentation is
-our @DOCS= split / |\n/, qx(ls -1 N[Ee][Ww][Ss] *[Ff][Aa][Qq]* *.[Tt][Xx][Tt] README* *.README [rR]eadme* *.[rR]eadme [Bb][Uu][Gg][Ss] *[tT][oO][dD][oO]* 2>/dev/null | egrep -v '^CMakeLists?.txt');
-# Figure out where is the first changelog, assign other similar files to docs
-my @changelogs= split / |\n/, qx(ls *[cC][hH][aA][nN][gG][eE][lL][oO][gG]* [cC][hH][aA][nN][gG][eE][sS]* 2>/dev/null);
-$CHANGELOG = $changelogs[0] if ($#changelogs != -1);
-shift @changelogs;
-@DOCS = (@DOCS,@changelogs);
 # Are there any .orig files in the upstream sources
 my @ORIG= split /[ \n]/, qx(find . -name '\*.orig');
 
@@ -598,19 +591,6 @@ if ( $custom ne "" )
 
 # kernel-patch kpatch file name
 rename "kpatches", "$package_name.kpatches" if $package_class eq "n";
-
-if ( -f "docs" )
-{
-	print "File docs already exists, skipping.\n";
-} else {
-	my $doc;
-	open (DOCSFILE,">docs");
-	foreach $doc (@DOCS)
-	{
-		print DOCSFILE "$doc\n";
-	}
-	close (DOCSFILE);
-}
 
 @filenames = split / |\n/, qx(ls package* 2>/dev/null);
 if ($#filenames != -1)
