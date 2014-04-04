@@ -128,7 +128,7 @@ EOF
 
 sub parse_args
 {
-	my ($dohelp,$doversion, $single,$indep,$multi,$library,$kmod,$kpatch);
+	my ($dohelp,$doversion, $daemon, $cron, $single,$indep,$multi,$library,$kmod,$kpatch);
 	if (GetOptions(
 			'copyright|c=s' => \$main::license,
 		    'packageclass|C=s' => \$main::package_class,
