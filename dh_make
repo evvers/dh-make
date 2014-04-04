@@ -7,11 +7,7 @@ use File::Basename;
 use Cwd;
 use strict;
 
-#Getopt::Long::Configure ("bundling");  
-#Getopt::Long::Configure ("bundling_override");  
 Getopt::Long::Configure ("no_ignore_case");  
-
-# Turns off autoabbrev to avoid mistakes with cdbs and copyright options.
 $Getopt::Long::autoabbrev = 0;
 
 # Some important parameters
@@ -362,7 +358,7 @@ while ($package_class eq "")
 
 if ($main::license eq '')
 {
-	$main::license = 'gpl3';
+	$main::license = 'bsd';
 }
 
 print_confirmation;
