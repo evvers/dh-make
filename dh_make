@@ -35,7 +35,7 @@ our $version="";
 our $fullname = "";
 our $rules_format = "dh7";
 our $source_file="";
-our $debian_native = 0;
+our $debian_native = 1;
 our $create_orig_tar = 0;
 our $package_class="";
 our $CHANGELOG="";
@@ -118,12 +118,7 @@ sub output_source_format
 	}
 
 	open OUT, ">$outfile" or die "Unable to open file $outfile for writing: $! \n";
-	if ($debian_native)
-   	{
-		print OUT "3.0 (native)\n";
-	} else {
-		print OUT "3.0 (quilt)\n";
-	}
+	print OUT "3.0 (native)\n";
 	close OUT;
 }
 
@@ -183,7 +178,6 @@ sub parse_args
 			'createorig' => \$main::create_orig_tar,
 			'help|h' => \$dohelp,
 			'version|v' => \$doversion,
-			'native|n' => \$main::debian_native,
 			'single|s' => \$single,
 			'indep|i' => \$indep,
 			'multi|m' => \$multi,
@@ -493,56 +487,13 @@ if ( ! $no_defaults )
 	}
 }
 
-# Debian native packages default to GPL v3, but it can be overwritten
-if ($debian_native && $main::license eq '')
+if ($main::license eq '')
 {
 	$main::license = 'gpl3';
 }
 
 print_confirmation;
 
-if (! $debian_native)
-{
-	if ( -f "../$package_name\_$version.orig.tar.gz")
-	{
-		print "Skipping creating ../$package_name\_$version.orig.tar.gz because it already exists\n";
-	} elsif ( -f "../$package_name\_$version.orig.tar.bz2") {
-		print "Skipping creating ../$package_name\_$version.orig.tar.bz2 because it already exists\n";
-	} elsif ( -f "../$package_name\_$version.orig.tar.lzma") {
-		print "Skipping creating ../$package_name\_$version.orig.tar.lzma because it already exists\n";
-	} elsif ( -f "../$package_name\_$version.orig.tar.xz") {
-		print "Skipping creating ../$package_name\_$version.orig.tar.xz because it already exists\n";
-	} else {
-		if ($source_file)
-		{
-			if (-f $source_file)
-			{
-				if ($source_file =~ /gz$/ ) 
-				{
-					system('cp', '-a', "$source_file", "../$package_name\_$version.orig.tar.gz");
-				} elsif ($source_file =~ /bz2$/ ) {
-					system('cp', '-a', "$source_file", "../$package_name\_$version.orig.tar.bz2");
-				} elsif ($source_file =~ /lzma$/ ) {
-					system('cp', '-a', "$source_file", "../$package_name\_$version.orig.tar.lzma");
-				} elsif ($source_file =~ /xz$/ ) {
-					system('cp', '-a', "$source_file", "../$package_name\_$version.orig.tar.xz");
-				}
-			} else {
-				print "Source archive you specified ( $source_file ) was not found!\n";
-				exit 1;
-			}
-		} else {
-			if ($create_orig_tar) {
-				system('tar', 'cfJ', "../$package_name\_$version.orig.tar.xz", ".");
-			} else {
-				print "Could not find $package_name\_$version.orig.tar.xz\n";
-				print "Either specify an alternate file to use with -f,\n";
-				print "or add --createorig to create one.\n";
-				exit 1;
-		 	}
-		}
-	}
-}
 # Figure out where documentation is
 our @DOCS= split / |\n/, qx(ls -1 N[Ee][Ww][Ss] *[Ff][Aa][Qq]* *.[Tt][Xx][Tt] README* *.README [rR]eadme* *.[rR]eadme [Bb][Uu][Gg][Ss] *[tT][oO][dD][oO]* 2>/dev/null | egrep -v '^CMakeLists?.txt');
 # What are our info files
@@ -819,13 +770,10 @@ if ( -f "info" )
 
 if ( ! $no_defaults )
 {
-	if ($debian_native)
+	@filenames = split / |\n/, qx{(cd $DHLIB/native && ls)};
+	foreach $filename (@filenames)
 	{
-		@filenames = split / |\n/, qx{(cd $DHLIB/native && ls)};
-		foreach $filename (@filenames)
-		{
-	  		process_file("$DHLIB/native/$filename", $filename);
-		}
+		process_file("$DHLIB/native/$filename", $filename);
 	}
 }
 
