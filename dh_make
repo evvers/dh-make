@@ -31,11 +31,9 @@ our $package_name="";
 our $cap_package_name="";
 our $version="";
 our $fullname = "";
-our $create_orig_tar = 0;
 our $package_class="";
 our $CHANGELOG="";
 our $PRESERVE="";
-our $custom = "";
 our $forced_package_name="";
 our $assume_yes = 0;
 our @filenames;
@@ -356,7 +354,6 @@ sub print_confirmation
 	} else {
 		die "Unknown type of config\n";
 	}
-	print "\nCustom template : $custom" if ( $custom ne "" );
 	if ($assume_yes == 0 )
 	{
 		print "\nHit <enter> to confirm: ";
@@ -499,7 +496,6 @@ if ($#filenames != -1)
 chmod 0755, 'rules';
 
 print "Done. Please edit the files in the debian/ subdirectory now.\n";
-
 
 exit 0;
 # vim:noet:sw=4:ts=4
