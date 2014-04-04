@@ -469,6 +469,8 @@ sub print_confirmation
 		print "\n";
 	}
 }
+
+# BEGIN
 $username = get_username();
 $email = get_email();
 $date = get_date();
