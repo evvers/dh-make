@@ -36,7 +36,6 @@ our $create_orig_tar = 0;
 our $package_class="";
 our $CHANGELOG="";
 our $PRESERVE="";
-our $add_missing = 0;
 our $custom = "";
 our $forced_package_name="";
 our $assume_yes = 0;
@@ -49,15 +48,7 @@ our $with_emacs = 0;
 sub process_file(@)
 {
 	my ($infile, $outfile) = @_;  
-	my $outfile2 = $outfile;
 	my $line;
-	$outfile2 =~ s/\.ex$//;
-
-	if ( $main::add_missing && ( -f $outfile  ||  -f $outfile2 ))
-	{
-		print "File $outfile exists, skipping.\n";
-		return;
-	}
 
 	open IN, "<$infile" or die "Unable to open template file $infile for reading: $! \n";
 	open OUT, ">$outfile" or die "Unable to open file $outfile for writing: $! \n";
@@ -100,12 +91,6 @@ sub process_file(@)
 sub output_source_format
 {
 	my $outfile = "source/format";
-
-	if ( $main::add_missing && -f $outfile)
-	{
-		print "File $outfile exists, skipping.\n";
-		return;
-	}
 
 	if ( ! -d 'source' )
 	{
@@ -177,7 +162,6 @@ sub parse_args
 			'kmod|k' => \$kmod,
 			'kpatch' => \$kpatch,
 			'with-emacs' => \$main::with_emacs,
-			'addmissing|a' => \$main::add_missing,
 			'templates|t=s' => \$main::custom,
 			'packagename|p=s' => \$main::forced_package_name,
 			'yes|y' => \$main::assume_yes
@@ -600,21 +584,13 @@ if ($package_class eq "n") {
 }
 
 # Customize files
-if ( $add_missing )
+if ( ! -d 'debian')
 {
-	if ( ! -d 'debian' )
-	{
-		die "--addmissing flag used but cannot find debian subdirectory\n";
-	}
+	mkdir 'debian', 0755 or die "Unable to make debian subdirectory: $! \n";
 } else {
-	if ( ! -d 'debian')
-	{
-		mkdir 'debian', 0755 or die "Unable to make debian subdirectory: $! \n";
-	} else {
-		print "You already have a debian/ subdirectory in the source tree.\n";
-		print "dh_make will not try to overwrite anything.\n";
-		exit 1;
-	}
+	print "You already have a debian/ subdirectory in the source tree.\n";
+	print "dh_make will not try to overwrite anything.\n";
+	exit 1;
 }
 chdir 'debian' or die "Unable to chdir to debian subdirectory: $! \n";
 
