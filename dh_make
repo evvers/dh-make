@@ -41,7 +41,6 @@ our $CHANGELOG="";
 our $PRESERVE="";
 our $add_missing = 0;
 our $custom = "";
-our $no_defaults = 0;
 our $forced_package_name="";
 our $assume_yes = 0;
 our @filenames;
@@ -186,7 +185,6 @@ sub parse_args
 			'addmissing|a' => \$main::add_missing,
 			'rulesformat|r=s' => \$main::rules_format,
 			'templates|t=s' => \$main::custom,
-			'defaultless|d' => \$main::no_defaults,
 			'packagename|p=s' => \$main::forced_package_name,
 			'yes|y' => \$main::assume_yes
 		) == 0)
@@ -443,7 +441,6 @@ sub print_confirmation
 		die "Unknown type of config\n";
 	}
 	print "\nCustom template : $custom" if ( $custom ne "" );
-	print "\nDefault debian and package class templates will not be applied." if ( $no_defaults );
 	if ($assume_yes == 0 )
 	{
 		print "\nHit <enter> to confirm: ";
@@ -471,18 +468,15 @@ for (my $i=0; $i<length("$main::package_name for Debian"); $i++)
 	$DASHLINE = $DASHLINE . '-';
 }
 
-if ( ! $no_defaults )
+while ($package_class eq "")
 {
-	while ($package_class eq "")
-	{
-		print "\nType of package: daemon-config, cron-config?\n [d/c] ";
-	 	my $type = <STDIN>;
-	 	chomp($type);
-	 	print "\n";
-	 	$type = lc($type);
-	 	$main::package_class = 'd' if $type eq 'd';
-	 	$main::package_class = 'c' if $type eq 'c';
-	}
+	print "\nType of package: daemon-config, cron-config?\n [d/c] ";
+	my $type = <STDIN>;
+	chomp($type);
+	print "\n";
+	$type = lc($type);
+	$main::package_class = 'd' if $type eq 'd';
+	$main::package_class = 'c' if $type eq 'c';
 }
 
 if ($main::license eq '')
@@ -651,58 +645,55 @@ if ( ! -d $DHLIB )
 	die "Unable to find dh_make's template directory: $! \n";
 }
 
-if ( ! $no_defaults )
+# Source format
+output_source_format();
+
+# General Files
+@filenames= split / |\n/, qx{(cd $DHLIB/debian && ls)};
+foreach $filename (@filenames)
 {
-	# Source format
-	output_source_format();
+	process_file("$DHLIB/debian/$filename", $filename);
+}
 
-	# General Files
-	@filenames= split / |\n/, qx{(cd $DHLIB/debian && ls)};
-	foreach $filename (@filenames)
+# Copyright file
+if ($license eq '') 
+{
+	process_file("$DHLIB/licenses/blank", "copyright");
+} else {
+	if ( -r "$DHLIB/licenses/$license" )
 	{
-		process_file("$DHLIB/debian/$filename", $filename);
-	}
-
-	# Copyright file
-	if ($license eq '') 
-	{
-		process_file("$DHLIB/licenses/blank", "copyright");
+		process_file("$DHLIB/licenses/$license", "copyright");
 	} else {
-		if ( -r "$DHLIB/licenses/$license" )
-		{
-			process_file("$DHLIB/licenses/$license", "copyright");
-		} else {
-			die "Unable to find copyright template file $DHLIB/licenses/$license";
-	 	}
+		die "Unable to find copyright template file $DHLIB/licenses/$license";
 	}
-	# Remove the  README if a kernel package, we use the specific one
-	if ( $package_class eq 'k')
-	{
-		unlink('README.Debian');
-	}
+}
+# Remove the  README if a kernel package, we use the specific one
+if ( $package_class eq 'k')
+{
+	unlink('README.Debian');
+}
 
-	# Special Files
-	@filenames = split / |\n/, qx{(cd $DHLIB/debian$package_class && ls)};
+# Special Files
+@filenames = split / |\n/, qx{(cd $DHLIB/debian$package_class && ls)};
+foreach $filename (@filenames)
+{
+	if ( $filename=~/^rules/ )
+	{
+		if ( $filename ne "rules.$rules_format")
+		{
+			next;
+		}
+	}
+	process_file("$DHLIB/debian$package_class/$filename", $filename);
+}
+
+# emacs files
+if ($with_emacs) 
+{
+	@filenames= split / |\n/, qx{(cd $DHLIB/emacs && ls)};
 	foreach $filename (@filenames)
 	{
-		if ( $filename=~/^rules/ )
-		{
-			if ( $filename ne "rules.$rules_format")
-			{
-				next;
-			}
-		}
-		process_file("$DHLIB/debian$package_class/$filename", $filename);
-	}
-
-	# emacs files
-	if ($with_emacs) 
-	{
-		@filenames= split / |\n/, qx{(cd $DHLIB/emacs && ls)};
-		foreach $filename (@filenames)
-		{
-			process_file("$DHLIB/emacs/$filename", $filename);
-		}
+		process_file("$DHLIB/emacs/$filename", $filename);
 	}
 }
 
