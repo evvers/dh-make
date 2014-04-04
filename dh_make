@@ -31,7 +31,6 @@ our $package_name="";
 our $cap_package_name="";
 our $version="";
 our $fullname = "";
-our $source_file="";
 our $create_orig_tar = 0;
 our $package_class="";
 our $CHANGELOG="";
@@ -41,7 +40,6 @@ our $forced_package_name="";
 our $assume_yes = 0;
 our @filenames;
 our $filename;
-our $SOURCE_EXTRADOCS="";
 our ($email, $date);
 
 sub process_file(@)
@@ -78,9 +76,7 @@ sub process_file(@)
 		$line =~ s/#PATCH_CLEAN#/$main::PATCH_CLEAN/g;
 		$line =~ s/#PATCH_STAMP#/$main::PATCH_STAMP/g;
 		$line =~ s/#BUILD_DEPS#/$main::BUILD_DEPS/g;
-		$line =~ s/#SOURCE_FILE_BASE#/$main::source_file_base/g;
 		$line =~ s/#DH7_ADDON#/$main::DH7_ADDON/g;
-		$line =~ s/#SOURCE_EXTRADOCS#/$main::SOURCE_EXTRADOCS/g;
 		print OUT $line;
 	}
 	close IN;
@@ -379,7 +375,6 @@ chomp $shortdate;
 our $year = qx(LC_ALL=C date '+%Y');
 chomp $year;
 parse_args();
-our $source_file_base=basename($source_file);
 get_package();
 
 # Generate a line of dashes, which is as long as '#PACKAGE# for Debian'.
