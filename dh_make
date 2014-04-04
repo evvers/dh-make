@@ -159,29 +159,13 @@ sub parse_args
 		show_help();
 		exit;
 	}
-	if ($single)
+	if ($daemon)
 	{
-		$main::package_class = 's';
+		$main::package_class = 'd';
 	}
-	if ($indep)
+	if ($cron)
 	{
-		$main::package_class = 'i';
-	}
-	if ($multi)
-	{
-		$main::package_class = 'm';
-	}
-	if ($library)
-	{
-		$main::package_class = 'l';
-	}
-	if ($kmod)
-	{
-		$main::package_class = 'k';
-	}
-	if ($kpatch)
-	{
-		$main::package_class = 'n';
+		$main::package_class = 'c';
 	}
 	$main::license = lc $main::license;
 	if ($main::license ne "" && !($main::license =~ /^(gpl|gpl2|gpl3|lgpl|lgpl2|lgpl3|artistic|bsd|blank|apache|mit)$/))
