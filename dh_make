@@ -106,9 +106,6 @@ sub output_source_format
 sub show_version
 {
 	print "dh_make - prepare Debian packaging for an original source archive, version $main::DH_MAKE_VERSION\n\n";
-	print "Copyright (C) 1998-2012 Craig Small <csmall\@debian.org>\n";
-	print "This is free software; see the source for copying conditions.  There is NO\n";
-	print "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n";
 }
 
 sub show_help
@@ -119,28 +116,13 @@ sub show_help
   -c, --copyright <type>    use <type> of license in copyright file
                             (apache|artistic|bsd|gpl|gpl2|gpl3|lgpl|lgpl2|
                              lgpl3|mit)
-  -C, --packageclass <cls>  set package class (s|i|k||l||m||n)
+  -C, --packageclass <cls>  set package class (d|c)
   -e, --email <address>     use <address> as the maintainer e-mail address
-  -f, --file <file>         specify file to use as the original source archive
-      --createorig          create orig.tar.xz file
-  -s, --single              set package class to single
-  -i, --indep               set package class to arch-independent
-  -m, --multi               set package class to multiple binary
-  -l, --library             set package class to library
-  -k, --kmod                set package class to kernel module
-      --kpatch              set package class to kernel patch
-      --with-emacs          add files for emacsen
-  -a, --addmissing          reprocess package and add missing files
-  -t, --templates <dir>     apply customizing templates in <dir>
-  -d  --defaultless         skip the default debian and package class templates
   -p, --packagename <name>  force package name to be <name>
   -y, --yes					Automatic yes to prompts and run non-interactively
   -h, --help                display this help screen and exit
   -v, --version             show the version and exit
 
-By Craig Small <csmall\@debian.org>
-Based on deb-make by Christoph Lameter <clameter\@debian.org>.
-Custom template support by Bruce Sass <bmsass\@shaw.ca>.
 EOF
 }
 
@@ -151,18 +133,8 @@ sub parse_args
 			'copyright|c=s' => \$main::license,
 		    'packageclass|C=s' => \$main::package_class,
 			'email|e=s' => \$main::email,
-			'file|f=s' => \$main::source_file,
-			'createorig' => \$main::create_orig_tar,
 			'help|h' => \$dohelp,
 			'version|v' => \$doversion,
-			'single|s' => \$single,
-			'indep|i' => \$indep,
-			'multi|m' => \$multi,
-			'library|l' => \$library,
-			'kmod|k' => \$kmod,
-			'kpatch' => \$kpatch,
-			'with-emacs' => \$main::with_emacs,
-			'templates|t=s' => \$main::custom,
 			'packagename|p=s' => \$main::forced_package_name,
 			'yes|y' => \$main::assume_yes
 		) == 0)
